@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Aarti's Blog</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <style>
+        /* Add your CSS styling here */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f2f2f2;
+            margin: 0;
+            padding: 0;
+        }
+        header {
+            background-color: #0078d4;
+            color: #fff;
+            text-align: center;
+            padding: 20px 0;
+        }
+        h1 {
+            margin: 0;
+        }
+        nav {
+            background-color: #333;
+            color: #fff;
+            text-align: center;
+            padding: 10px 0;
+        }
+        nav ul {
+            list-style-type: none;
+            margin: 0;
+            padding: 0;
+        }
+        nav ul li {
+            display: inline;
+            margin-right: 20px;
+        }
+        nav ul li a {
+            color: #fff;
+            text-decoration: none;
+            font-weight: bold;
+        }
+        main {
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: #fff;
+        }
+        #gallery {
+            padding: 20px;
+        }
+        #addImage {
+            background-color: #0078d4;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        #addImage:hover {
+            background-color: #0056b3;
+        }
+        #imageList {
+            list-style: none;
+            display: flex;
+            flex-wrap: wrap;
+        }
+        #imageList li {
+            margin: 10px;
+            text-align: center;
+            position: relative;
+        }
+        #imageList img {
+            max-width: 100%;
+            max-height: 100%;
+            cursor: zoom-in;
+            width: 500px;
+            height: auto;
+        }
+        .deleteImage {
+            background-color: #f44336;
+            color: #fff;
+            border: none;
+            padding: 5px 10px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            position: absolute;
+            bottom: 10px;
+            left: 10px;
+        }
+        .deleteImage:hover {
+            background-color: #d32f2f;
+        }
+        .active-tab {
+            background-color: #0056b3;
+        }
+        .sub-tabs {
+            display: none;
+            margin-top: 20px;
+            background-color: #0078d4;
+            padding: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Aarti's Blog</h1>
+    </header>
+    <nav>
+        <ul>
+            <li><a href="javascript:void(0);" id="homeTab" class="active-tab">Home</a></li>
+            <li><a href="javascript:void(0);" id="aboutTab">About</a></li>
+            <li><a href="javascript:void(0);" id="blogTab">Blog</a></li>
+            <li><a href="javascript:void(0);" id="contactTab">Contact</a></li>
+            <li><a href="javascript:void(0);" id="galleryTab">Gallery</a></li>
+            <li><a href="javascript:void(0);" id="poemsTab">Poems</a></li>
+        </ul>
+    </nav>
+    <main>
+        <div id="homeContent">
+            <h2>Welcome to Aarti's Blog</h2>
+            <p>Welcome to my blog where I share my thoughts and experiences. Stay tuned for interesting articles!</p>
+        </div>
+        <!-- Gallery Section -->
+        <div id="gallery" style="display: none;">
+            <h2>Gallery</h2>
+            <button id="addImage">Add New Image</button>
+            <input type="file" id="imageInput" accept="image/*" style="display: none;">
+            <ul id="imageList">
+                <!-- Images will be displayed here -->
+            </ul>
+        </div>
+        <!-- Poems Section -->
+        <div id="poemsContent" class="sub-tabs">
+            <h2>Poems</h2>
+            <button id="addPoemButton">Add New Poem</button>
+            <div id="poemEntry" style="display: none;">
+                <input type="text" id="poemText" placeholder="Enter your poem">
+                <button id="savePoemButton">Save</button>
+            </div>
+            <div id="poemList">
+                <!-- Poems will be displayed here -->
+            </div>
+        </div>
+    </main>
+    <script>
+        const tabs = document.querySelectorAll('nav ul li a');
+        const homeContent = document.getElementById('homeContent');
+        const poemContent = document.getElementById('poemsContent');
+        const addPoemButton = document.getElementById('addPoemButton');
+        const poemEntry = document.getElementById('poemEntry');
+        const poemText = document.getElementById('poemText');
+        const savePoemButton = document.getElementById('savePoemButton');
+        const poemList = document.getElementById('poemList');
+        let poems = []; // Store the poems
+
+        function switchTab(tabId) {
+            tabs.forEach(tab => tab.classList.remove('active-tab'));
+            document.getElementById(tabId).classList.add('active-tab');
+            const mainContent = document.querySelector('main');
+            if (tabId === 'galleryTab') {
+                document.getElementById('gallery').style.display = 'block';
+            } else {
+                document.getElementById('gallery').style.display = 'none';
+            }
+            if (tabId === 'homeTab') {
+                homeContent.style.display = 'block';
+            } else {
+                homeContent.style.display = 'none';
+            }
+            if (tabId === 'poemsTab') {
+                poemContent.style.display = 'block';
+                displayPoems();
+            } else {
+                poemContent.style.display = 'none';
+            }
+        }
+
+        tabs.forEach(tab => {
+            tab.addEventListener('click', function () {
+                const tabId = this.id;
+                switchTab(tabId);
+            });
+        });
+
+        addPoemButton.addEventListener('click', function () {
+            poemEntry.style.display = 'block';
+            poemText.value = '';
+        });
+
+        savePoemButton.addEventListener('click', function () {
+            const poem = poemText.value;
+            if (poem.trim() !== '') {
+                poems.push(poem);
+                displayPoems();
+                poemText.value = '';
+                poemEntry.style.display = 'none';
+            }
+        });
+
+        function displayPoems() {
+            poemList.innerHTML = '';
+            poems.forEach((poem, index) => {
+                const poemItem = document.createElement('div');
+                poemItem.innerHTML = `<p>${poem}</p>`;
+                poemList.appendChild(poemItem);
+            });
+        }
+
+        document.getElementById('addImage').addEventListener('click', function () {
+            document.getElementById('imageInput').click();
+        });
+
+        document.getElementById('imageInput').addEventListener('change', function () {
+            const imageInput = document.getElementById('imageInput');
+            const imageList = document.getElementById('imageList');
+
+            if (imageInput.files && imageInput.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    const newImage = document.createElement('li');
+                    newImage.innerHTML = `<img src="${e.target.result}" style="max-width: 100%; max-height; cursor: zoom-in;"> <i class="fa fa-trash deleteImage"></i>`;
+                    imageList.appendChild(newImage);
+
+                    newImage.querySelector('img').addEventListener('click', function () {
+                        if (this.style.cursor === 'zoom-in') {
+                            this.style.cursor = 'zoom-out';
+                        } else {
+                            this.style.cursor = 'zoom-in';
+                        }
+                    });
+
+                    const deleteIcon = newImage.querySelector('.deleteImage');
+                    deleteIcon.addEventListener('click', function () {
+                        newImage.remove();
+                    });
+                };
+                reader.readAsDataURL(imageInput.files[0]);
+            }
+        });
+    </script>
+</body>
+</html> 
